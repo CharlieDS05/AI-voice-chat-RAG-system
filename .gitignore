@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Secrets & local config
+.env
+
+# User data & local artifacts
+data/
+chroma_db/
+*.sqlite3
+
+# macOS
+.DS_Store
+
+# Evaluation outputs
+evaluation/results/
