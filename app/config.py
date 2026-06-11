@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     # Ingestion & chunking
     chunk_size: int = 1000
     chunk_overlap: int = 150
+    min_chunk_chars: int = 50
 
 
 # A single shared instance the rest of the app imports.

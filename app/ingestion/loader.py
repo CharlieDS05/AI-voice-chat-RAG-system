@@ -51,6 +51,9 @@ def chunk_documents(pages: list[Document]) -> list[Document]:
         chunk_overlap=settings.chunk_overlap,
     )
     chunks = splitter.split_documents(pages)
+    chunks = [
+        c for c in chunks 
+        if len(c.page_content.strip()) >= settings.min_chunk_chars]
 
     for index, chunk in enumerate(chunks):
         filename = Path(chunk.metadata.get("source", "unknown")).name

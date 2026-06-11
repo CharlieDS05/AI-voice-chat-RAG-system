@@ -29,7 +29,7 @@ def main() -> None:
 
     # The overlap seam, made visible: the end of chunk 1 should reappear
     # at the start of chunk 2 (when both come from the same page).
-    if len(chunks) >= 2:
+    if len(chunks) >= 3:
         print("Tail of chunk 1:", repr(chunks[1].page_content[-80:]))
         print("Head of chunk 2:", repr(chunks[2].page_content[:80]))
 
