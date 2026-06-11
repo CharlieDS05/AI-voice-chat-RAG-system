@@ -13,7 +13,9 @@ def main() -> None:
     print(f"Hosted base URL  : {settings.hosted_base_url}")
     print(f"Hosted model     : {settings.hosted_model}")
     # We print only WHETHER a key is set — never the key itself.
-    print(f"Hosted API key   : {'set' if settings.hosted_api_key else 'not set (fine for local mode)'}")
+    # We print only WHETHER a key is set — never the key itself.
+    key_status = "set" if settings.hosted_api_key else "not set (fine for local mode)"
+    print(f"Hosted API key   : {key_status}")
 
 
 if __name__ == "__main__":
