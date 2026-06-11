@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     # repr=False: never print the secret when the object is printed
     hosted_api_key: str = Field(default="", repr=False)
 
+    # Ingestion & chunking
+    chunk_size: int = 1000
+    chunk_overlap: int = 150
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic
