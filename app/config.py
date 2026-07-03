@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     # repr=False: never print the secret when the object is printed
     hosted_api_key: str = Field(default="", repr=False)
 
+    # Embeddings & vector store
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    chroma_dir: str = "chroma_db"
+    collection_name: str = "documents"
+
     # Ingestion & chunking
     chunk_size: int = 1000
     chunk_overlap: int = 150
