@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     chunk_overlap: int = 150
     min_chunk_chars: int = 50
 
+    # Hybrid retrieval
+    retrieval_k: int = 10  # candidates pulled from each retriever before fusion
+    rrf_k: int = 60  # RRF damping constant
+    hybrid_top_n: int = 10  # fused candidates kept, the reranker's input pool
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic
