@@ -23,12 +23,16 @@ def get_embeddings() -> HuggingFaceEmbeddings:
     return _embeddings
 
 
+# cosine similarity is the default for sentence-transformers
+
+
 def get_vectorstore(collection: str | None = None) -> Chroma:
     """Open (or create) a persistent Chroma collection."""
     return Chroma(
         collection_name=collection or settings.collection_name,
         embedding_function=get_embeddings(),
         persist_directory=settings.chroma_dir,
+        collection_metadata={"hnsw:space": "cosine"},
     )
 
 

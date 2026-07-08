@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     rrf_k: int = 60  # RRF damping constant
     hybrid_top_n: int = 10  # fused candidates kept, the reranker's input pool
 
+    # Reranking
+    reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    rerank_top_k: int = 4  # final chunks handed to the LLM
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic
