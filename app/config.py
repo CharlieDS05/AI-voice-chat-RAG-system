@@ -53,6 +53,11 @@ class Settings(BaseSettings):
     reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
     rerank_top_k: int = 4  # final chunks handed to the LLM
 
+    # Generation
+    temperature: float = 0.0
+    max_answer_tokens: int = 512
+    prompt_file: str = "prompts/rag_system.yaml"
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic
