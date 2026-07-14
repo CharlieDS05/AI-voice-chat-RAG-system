@@ -55,10 +55,14 @@ kubernetes==36.0.2
 langchain-chroma==1.1.0
 langchain-classic==1.0.8
 langchain-community==0.4.2
-langchain-core==1.4.4
+langchain-core==1.4.9
 langchain-huggingface==1.2.2
-langchain-protocol==0.0.16
+langchain-protocol==0.0.18
 langchain-text-splitters==1.1.2
+langgraph==1.2.9
+langgraph-checkpoint==4.1.1
+langgraph-prebuilt==1.1.0
+langgraph-sdk==0.4.2
 langsmith==0.8.14
 markdown-it-py==4.2.0
 MarkupSafe==3.0.3
@@ -81,6 +85,7 @@ opentelemetry-proto==1.43.0
 opentelemetry-sdk==1.43.0
 opentelemetry-semantic-conventions==0.64b0
 orjson==3.11.9
+ormsgpack==1.12.2
 overrides==7.7.0
 packaging==26.2
 pandas==3.0.3
@@ -145,7 +150,7 @@ uvloop==0.22.1
 watchfiles==1.2.0
 wcwidth==0.7.0
 websocket-client==1.9.0
-websockets==16.0
+websockets==15.0.1
 xxhash==3.7.0
 yarl==1.24.2
 zstandard==0.25.0
