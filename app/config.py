@@ -64,6 +64,10 @@ class Settings(BaseSettings):
         "I don't have enough information in the provided documents to answer that."
     )
 
+    # Voice
+    whisper_model: str = "mlx-community/whisper-base-mlx"
+    piper_voice: str = "models/voices/en_US-lessac-medium.onnx"
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic

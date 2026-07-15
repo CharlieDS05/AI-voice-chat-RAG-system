@@ -13,6 +13,8 @@ from app.graph import make_graph
 from app.ingestion.loader import ingest_pdf
 from app.retrieval.bm25 import build_bm25_index
 from app.retrieval.vectorstore import index_chunks
+from app.voice.stt import transcribe
+from app.voice.tts import synthesize
 
 
 class RagApp:
@@ -53,6 +55,28 @@ class RagApp:
         sources = {f"{s['source']}, p.{s['page']}" for s in state["sources"]}
         cited = "\n".join(f"- {s}" for s in sorted(sources))
         return f"{state['answer']}\n\n**Evidence shown to the model:**\n{cited}"
+
+    def voice_ask(self, audio_path: str | None):
+        """Mic audio in -> (transcribed question, answer text, spoken answer)."""
+        if self.graph is None:
+            return "", "Please upload a PDF first.", None
+
+        question = transcribe(audio_path)
+        if not question:
+            return "", "I couldn't hear anything — try recording again.", None
+
+        state = self.graph.invoke({"question": question})
+        answer = state["answer"]
+
+        if not state["refused"]:
+            sources = {f"{s['source']}, p.{s['page']}" for s in state["sources"]}
+            answer_display = f"{answer}\n\n**Evidence:** " + "; ".join(sorted(sources))
+        else:
+            answer_display = answer
+
+        # Speak ONLY the answer text, citations are for the screen.
+        audio_out = synthesize(answer)
+        return question, answer_display, audio_out
 
 
 # Theme
@@ -234,6 +258,17 @@ CSS = """
 }
  
 footer { display: none !important; }
+
+#voice-panel {
+    border: 1px solid #1F2A44 !important;
+    border-radius: 12px;
+    background: #0D1424;
+    margin-top: 10px;
+}
+#heard-box textarea {
+    font-family: 'JetBrains Mono', ui-monospace, monospace !important;
+    font-size: 0.82rem !important;
+}
 """
 
 
@@ -293,6 +328,15 @@ def build_demo() -> gr.Blocks:
                 ),
             )
 
+        with gr.Accordion("🎙️ Voice mode", open=False, elem_id="voice-panel"):
+            with gr.Row():
+                mic = gr.Audio(sources=["microphone"], type="filepath", label="Ask by voice")
+                heard = gr.Textbox(label="What I heard", interactive=False, elem_id="heard-box")
+            voice_answer = gr.Markdown(label="Answer")
+            speaker = gr.Audio(label="Spoken answer", autoplay=True)
+
+            mic.stop_recording(app.voice_ask, inputs=mic, outputs=[heard, voice_answer, speaker])
+
     return demo
 
 
@@ -303,6 +347,7 @@ def main() -> None:
         share=False,
         theme=THEME,
         css=CSS,
+        show_error=True,
     )
 
 

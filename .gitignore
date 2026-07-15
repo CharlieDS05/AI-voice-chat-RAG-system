@@ -17,3 +17,6 @@ chroma_db/
 
 # Evaluation outputs
 evaluation/results/
+
+# Downloaded model artifacts
+models/
