@@ -1,0 +1,85 @@
+# Golden evaluation dataset — versioned, hand-reviewed ground truth.
+# Every entry is a verifiable expectation about system behavior.
+# Grow this toward 100+ entries; every discovered failure becomes an entry.
+#
+# Fields:
+#   id:             stable identifier
+#   question:       what gets asked
+#   answerable:     should the system attempt an answer (true) or refuse (false)?
+#   expected_pages: pages where supporting evidence lives (answerable only)
+#   category:       failure-mode family, for per-category score breakdowns
+
+version: 1
+cases:
+  # Core answerable questions (validated during Steps 6-12)
+  - id: pie-hard-to-read
+    question: "What makes a pie chart hard to read?"
+    answerable: true
+    expected_pages: [79, 80, 81]
+    category: direct
+
+  - id: preattentive-what-why
+    question: "What are preattentive attributes and why do they matter?"
+    answerable: true
+    expected_pages: [118, 119, 120, 121, 122, 123]
+    category: direct
+
+  - id: chart-type-choice
+    question: "How do I choose the right chart type for my data?"
+    answerable: true
+    expected_pages: [59, 269]
+    category: direct
+
+  - id: clutter-why-enemy
+    question: "Why is clutter the enemy of good visualization?"
+    answerable: true
+    expected_pages: [87, 88, 108]
+    category: direct
+
+  - id: tables-vs-graphs
+    question: "When should I use a table instead of a graph?"
+    answerable: true
+    expected_pages: [55, 56, 57, 58, 59]
+    category: direct
+
+  # The documented hard case: vocabulary gap (query 2's throne)
+  - id: vocab-gap-clutter
+    question: "Why is too much information on a graph bad?"
+    answerable: true
+    expected_pages: [87, 88, 108, 112]
+    category: vocabulary-gap
+
+  # Multi-source synthesis (tracks the citation-placement drift)
+  - id: multi-source-lessons
+    question: "What are the main lessons of storytelling with data?"
+    answerable: true
+    expected_pages: [31, 258, 267, 269]
+    category: multi-source
+
+  # Paraphrase robustness
+  - id: paraphrase-audience
+    question: "How should I think about who I'm communicating to?"
+    answerable: true
+    expected_pages: [26, 27, 31, 36, 37, 38, 39, 40]
+    category: paraphrase
+
+  # Unanswerable: must be refused at the gate
+  - id: unanswerable-kubernetes
+    question: "How do I configure a Kubernetes cluster?"
+    answerable: false
+    category: unanswerable
+
+  - id: unanswerable-weather
+    question: "What will the weather be like tomorrow in Bogota?"
+    answerable: false
+    category: unanswerable
+
+  - id: unanswerable-recipe
+    question: "How do I make a good lasagna?"
+    answerable: false
+    category: unanswerable
+
+  - id: unanswerable-adjacent
+    question: "What does the book say about training neural networks?"
+    answerable: false
+    category: unanswerable-adjacent

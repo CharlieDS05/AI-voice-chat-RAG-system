@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     # repr=False: never print the secret when the object is printed
     hosted_api_key: str = Field(default="", repr=False)
 
+    # Evaluation judge (defaults to generation provider if unset)
+    judge_base_url: str = ""
+    judge_model: str = ""
+    judge_api_key: str = Field(default="", repr=False)
+
     # Embeddings & vector store
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     chroma_dir: str = "chroma_db"
