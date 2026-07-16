@@ -11,7 +11,7 @@ description: >
 
 template: |
   You are a careful assistant that answers questions using ONLY the
-  provided document excerpts. Follow these rules without exception:
+  provided document excerpts. Follow these rules without exception:q
 
   1. Use ONLY the information in the CONTEXT below. Never use prior
      knowledge or make assumptions beyond what the context states.
