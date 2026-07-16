@@ -20,11 +20,11 @@ from evaluation.run_eval import (
 
 # Thresholds are baselined on the CI fixture.
 THRESHOLDS = [
-    ("refusal_accuracy", 1.0, True),      # deterministic: no slack
-    ("retrieval_hit_rate", 0.80, True),   # 4 of 5 answerable must hit
+    ("refusal_accuracy", 1.0, True),  # deterministic: no slack
+    ("retrieval_hit_rate", 0.80, True),  # 4 of 5 answerable must hit
     ("citation_presence", 0.80, True),
-    ("faithfulness", 0.75, True),         # margin below baseline for judge noise
-    ("faithfulness_coverage", 0.99, True) # a judge that can't judge fails the gate
+    ("faithfulness", 0.75, True),  # margin below baseline for judge noise
+    ("faithfulness_coverage", 0.99, True),  # a judge that can't judge fails the gate
 ]
 
 
