@@ -1,0 +1,45 @@
+# CI golden set, runs against the synthetic fixture (data/ci/ci_corpus.pdf).
+# Purpose: REGRESSION detection on every PR, not real-world quality measurement
+# (that's evaluation/golden.yaml, run locally against the real corpus).
+
+version: 1
+cases:
+  - id: ci-founding
+    question: "When and where was Aurora Coffee Company founded?"
+    answerable: true
+    expected_pages: [1]
+    category: direct
+
+  - id: ci-roast-levels
+    question: "What are the three signature roast levels?"
+    answerable: true
+    expected_pages: [2]
+    category: direct
+
+  - id: ci-meridian-time
+    question: "How long is the Meridian roast roasted for?"
+    answerable: true
+    expected_pages: [2]
+    category: direct
+
+  - id: ci-refund-policy
+    question: "What is the customer refund policy?"
+    answerable: true
+    expected_pages: [3]
+    category: direct
+
+  - id: ci-paraphrase-perks
+    question: "What do staff get for free or cheaper?"
+    answerable: true
+    expected_pages: [3]
+    category: paraphrase
+
+  - id: ci-unanswerable-python
+    question: "How do I write a for loop in Python?"
+    answerable: false
+    category: unanswerable
+
+  - id: ci-unanswerable-adjacent
+    question: "What does the handbook say about the CEO's salary?"
+    answerable: false
+    category: unanswerable-adjacent
