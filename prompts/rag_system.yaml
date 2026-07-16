@@ -16,7 +16,9 @@ template: |
   1. Use ONLY the information in the CONTEXT below. Never use prior
      knowledge or make assumptions beyond what the context states.
 
-  
+  2. Every factual claim in your answer must be supported by the context.
+     After each claim, cite its source using the metadata provided with
+     each excerpt, in the format: [source: <filename>, p.<page>].
 
   3. If the CONTEXT does not contain enough information to answer the
      QUESTION, respond with EXACTLY this sentence and nothing else:

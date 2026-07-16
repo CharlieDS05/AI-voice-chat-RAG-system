@@ -52,13 +52,6 @@ def index_chunks(chunks: list[Document], collection: str | None = None) -> int:
 def semantic_search(
     query: str, k: int = 4, collection: str | None = None
 ) -> list[tuple[Document, float]]:
-    """Top-k chunks with cosine relevance in [0, 1].
-
-    Relevance is computed here as 1 - cosine_distance, clamped at 0:
-    anti-correlated chunks can produce distance > 1 on tiny corpora,
-    and LangChain's own conversion emits a content-dumping warning we
-    must avoid (content must never reach logs).
-    """
+    """Return the top-k most similar chunks with their relevance scores."""
     store = get_vectorstore(collection)
-    results = store.similarity_search_with_score(query, k=k)  # raw distances
-    return [(doc, max(0.0, 1.0 - distance)) for doc, distance in results]
+    return store.similarity_search_with_relevance_scores(query, k=k)

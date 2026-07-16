@@ -9,7 +9,7 @@ venv/
 
 # User data & local artifacts
 data/
-chroma_*/
+chroma_db/
 *.sqlite3
 
 # macOS

@@ -64,7 +64,7 @@ class Settings(BaseSettings):
     prompt_file: str = "prompts/rag_system.yaml"
 
     # Answerability gate
-    refusal_threshold: float = -5.0  # top rerank score below this -> refuse
+    refusal_threshold: float = 0.0  # top rerank score below this -> refuse
     refusal_message: str = (
         "I don't have enough information in the provided documents to answer that."
     )
