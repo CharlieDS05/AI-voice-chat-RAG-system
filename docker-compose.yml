@@ -1,0 +1,22 @@
+services:
+  rag-app:
+    build: .
+    ports:
+      - "127.0.0.1:7860:7860"   # published to localhost ONLY: privacy by default
+    environment:
+      LLM_PROVIDER: ${LLM_PROVIDER:-local}
+      # Inside a container, "localhost" is the container itself;
+      # host.docker.internal reaches the machine running native Ollama.
+      OLLAMA_BASE_URL: http://host.docker.internal:11434/v1
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2:3b}
+      HOSTED_BASE_URL: ${HOSTED_BASE_URL:-}
+      HOSTED_MODEL: ${HOSTED_MODEL:-}
+      HOSTED_API_KEY: ${HOSTED_API_KEY:-}
+      REFUSAL_THRESHOLD: ${REFUSAL_THRESHOLD:--5.0}
+    volumes:
+      - chroma_data:/app/chroma_db   # the index survives container restarts
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # makes the hostname work on native Linux too
+
+volumes:
+  chroma_data:

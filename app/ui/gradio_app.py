@@ -13,8 +13,16 @@ from app.graph import make_graph
 from app.ingestion.loader import ingest_pdf
 from app.retrieval.bm25 import build_bm25_index
 from app.retrieval.vectorstore import index_chunks
-from app.voice.stt import transcribe
-from app.voice.tts import synthesize
+
+# Graceful voice degradation: if the user doesn't have the optional dependencies installed,
+# the voice panel will be hidden and the app will still work for text-only chat.
+try:
+    from app.voice.stt import transcribe
+    from app.voice.tts import synthesize
+
+    VOICE_AVAILABLE = True
+except ImportError:
+    VOICE_AVAILABLE = False
 
 
 class RagApp:
@@ -328,14 +336,22 @@ def build_demo() -> gr.Blocks:
                 ),
             )
 
-        with gr.Accordion("🎙️ Voice mode", open=False, elem_id="voice-panel"):
-            with gr.Row():
-                mic = gr.Audio(sources=["microphone"], type="filepath", label="Ask by voice")
-                heard = gr.Textbox(label="What I heard", interactive=False, elem_id="heard-box")
-            voice_answer = gr.Markdown(label="Answer")
-            speaker = gr.Audio(label="Spoken answer", autoplay=True)
+        if VOICE_AVAILABLE:
+            with gr.Accordion("🎙️ Voice mode", open=True, elem_id="voice-panel"):
+                with gr.Row():
+                    mic = gr.Audio(sources=["microphone"], type="filepath", label="Ask by voice")
+                    heard = gr.Textbox(label="What I heard", interactive=False, elem_id="heard-box")
+                voice_answer = gr.Markdown(label="Answer")
+                speaker = gr.Audio(label="Spoken answer", autoplay=True)
 
-            mic.stop_recording(app.voice_ask, inputs=mic, outputs=[heard, voice_answer, speaker])
+                mic.stop_recording(
+                    app.voice_ask, inputs=mic, outputs=[heard, voice_answer, speaker]
+                )
+        else:
+            gr.Markdown(
+                "*🎙️ Voice mode requires a native Apple Silicon run "
+                "(MLX Whisper). Running in text-only mode.*"
+            )
 
     return demo
 
@@ -343,7 +359,7 @@ def build_demo() -> gr.Blocks:
 def main() -> None:
     # localhost only, no public share link: privacy by default.
     build_demo().launch(
-        server_name="127.0.0.1",
+        server_name=settings.server_name,
         share=False,
         theme=THEME,
         css=CSS,

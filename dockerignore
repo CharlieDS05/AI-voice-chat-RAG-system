@@ -1,0 +1,12 @@
+.git
+.venv
+__pycache__
+*.py[cod]
+.env
+data/
+chroma_db/
+chroma_*/
+models/
+evaluation/results/
+.github
+.DS_Store

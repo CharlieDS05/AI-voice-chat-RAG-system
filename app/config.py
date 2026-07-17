@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     judge_model: str = ""
     judge_api_key: str = Field(default="", repr=False)
 
+    # Server
+    server_name: str = "127.0.0.1"
+
     # Embeddings & vector store
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     chroma_dir: str = "chroma_db"
