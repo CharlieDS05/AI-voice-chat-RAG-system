@@ -7,18 +7,24 @@ far more accurate than any comparison of independently computed
 vectors, and affordable because the pool is small.
 """
 
+from typing import TYPE_CHECKING
+
 from langchain_core.documents import Document
-from sentence_transformers import CrossEncoder
 
 from app.config import settings
 
+if TYPE_CHECKING:
+    from sentence_transformers import CrossEncoder
+
 # Same lazy-singleton pattern as the embedder: load once per process.
-_reranker: CrossEncoder | None = None
+_reranker: "CrossEncoder | None" = None
 
 
-def get_reranker() -> CrossEncoder:
+def get_reranker() -> "CrossEncoder":
     global _reranker
     if _reranker is None:
+        from sentence_transformers import CrossEncoder
+
         _reranker = CrossEncoder(settings.reranker_model)
     return _reranker
 

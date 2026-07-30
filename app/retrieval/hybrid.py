@@ -9,7 +9,6 @@ from langchain_core.documents import Document
 
 from app.config import settings
 from app.retrieval.bm25 import BM25Index
-from app.retrieval.vectorstore import semantic_search
 
 
 def reciprocal_rank_fusion(
@@ -42,6 +41,9 @@ def hybrid_search(
     collection: str | None = None,
 ) -> list[tuple[Document, float]]:
     """Run dense + BM25 retrieval and return the RRF-fused top_n."""
+
+    from app.retrieval.vectorstore import semantic_search
+
     top_n = top_n or settings.hybrid_top_n
 
     dense_docs = [

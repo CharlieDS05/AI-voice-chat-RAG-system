@@ -32,6 +32,9 @@ jobs:
       - name: Lint
         run: ruff check . && ruff format --check .
 
+      - name: Unit tests
+        run: pytest tests/unit -v
+
       - name: Build CI corpus and index
         run: |
           python -m scripts.make_ci_corpus

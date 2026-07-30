@@ -8,7 +8,6 @@ evaluation) rely on this metadata and must never have to guess it.
 
 from pathlib import Path
 
-from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.documents import Document
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
@@ -21,6 +20,8 @@ def load_pdf(path: str | Path) -> list[Document]:
     Raises FileNotFoundError for a missing file and ValueError for
     a PDF that yields no text (e.g. a scanned/image-only PDF).
     """
+    from langchain_community.document_loaders import PyPDFLoader
+
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(f"No such file: {path}")

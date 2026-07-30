@@ -11,7 +11,6 @@ from langchain_core.documents import Document
 from rank_bm25 import BM25Okapi
 
 from app.config import settings
-from app.retrieval.vectorstore import get_vectorstore
 
 _TOKEN_RE = re.compile(r"[a-z0-9]+")  # Rule for compiling tokens: lowercase alphanumeric sequences
 
@@ -48,6 +47,8 @@ class BM25Index:
 # loads the corpus from the Chroma collection, returning a list of Document objects
 def load_corpus_from_chroma(collection: str | None = None) -> list[Document]:
     """Read every chunk (text + metadata) back out of the Chroma collection."""
+    from app.retrieval.vectorstore import get_vectorstore
+
     store = get_vectorstore(collection)
     payload = store.get(include=["documents", "metadatas"])
     return [
