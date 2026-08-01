@@ -29,6 +29,7 @@ class RAGState(TypedDict, total=False):
     refused: bool
     answer: str
     sources: list[dict]
+    provider: str
 
 
 def make_graph(bm25_index: BM25Index):
@@ -50,7 +51,7 @@ def make_graph(bm25_index: BM25Index):
         return "generate"
 
     def generate_node(state: RAGState) -> RAGState:
-        result = generate_answer(state["question"], state["docs"])
+        result = generate_answer(state["question"], state["docs"], provider=state.get("provider"))
         return {"answer": result.answer, "sources": result.sources, "refused": False}
 
     def refuse_node(state: RAGState) -> RAGState:

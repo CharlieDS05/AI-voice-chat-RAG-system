@@ -51,11 +51,14 @@ class RagApp:
         except (FileNotFoundError, ValueError) as exc:
             return f"⚠️ {exc}"
 
-    def chat(self, message: str, history: list[dict]) -> str:
+    def chat(self, message: str, history: list[dict], provider: str = "local") -> str:
         if self.graph is None:
             return "Please upload a PDF first — I have no documents indexed yet."
 
-        state = self.graph.invoke({"question": message})
+        try:
+            state = self.graph.invoke({"question": message, "provider": provider})
+        except ValueError as exc:  # hosted selected but no API key
+            return f"⚠️ {exc}"
 
         if state["refused"]:
             return state["answer"]
@@ -64,8 +67,7 @@ class RagApp:
         cited = "\n".join(f"- {s}" for s in sorted(sources))
         return f"{state['answer']}\n\n**Evidence shown to the model:**\n{cited}"
 
-    def voice_ask(self, audio_path: str | None):
-        """Mic audio in -> (transcribed question, answer text, spoken answer)."""
+    def voice_ask(self, audio_path: str | None, provider: str = "local"):
         if self.graph is None:
             return "", "Please upload a PDF first.", None
 
@@ -73,7 +75,11 @@ class RagApp:
         if not question:
             return "", "I couldn't hear anything — try recording again.", None
 
-        state = self.graph.invoke({"question": question})
+        try:
+            state = self.graph.invoke({"question": question, "provider": provider})
+        except ValueError as exc:
+            return question, f"⚠️ {exc}", None
+
         answer = state["answer"]
 
         if not state["refused"]:
@@ -277,7 +283,21 @@ footer { display: none !important; }
     font-family: 'JetBrains Mono', ui-monospace, monospace !important;
     font-size: 0.82rem !important;
 }
+#provider-panel {
+    border: 1px solid #1F2A44;
+    border-radius: 12px;
+    background: #0D1424;
+    padding: 10px 12px;
+    margin-top: 10px;
+}
 """
+
+
+def _privacy_text(provider: str) -> str:
+    """Live privacy disclosure — must match the selected engine, not the default."""
+    if provider == "local":
+        return "🔒 **Local** — documents, embeddings, and answers stay on this machine."
+    return "☁️ **Hosted** — retrieved excerpts are sent to the configured API provider."
 
 
 def build_demo() -> gr.Blocks:
@@ -290,9 +310,7 @@ def build_demo() -> gr.Blocks:
       <p class="wordmark">Local RAG<span class="tick">_</span></p>
       <p class="tagline">Ask questions of your own documents. Every answer cites its evidence.</p>
       <div id="rail">
-        <span class="badge live">LOCAL &nbsp;<b>all processing stays on this machine</b></span>
-        <span class="badge">PROVIDER &nbsp;<b>{settings.llm_provider}</b></span>
-        <span class="badge">INDEX &nbsp;<b>{corpus_state}</b></span>
+        <span class="badge live">INDEX &nbsp;<b>{corpus_state}</b></span>
       </div>
     </div>
     """
@@ -318,9 +336,22 @@ def build_demo() -> gr.Blocks:
 
         file_box.upload(app.upload, inputs=file_box, outputs=status)
 
+        with gr.Group(elem_id="provider-panel"):
+            provider = gr.Radio(
+                choices=["local", "hosted"],
+                value=settings.llm_provider,
+                label="Answer engine",
+                info="Hosted mode requires HOSTED_API_KEY in .env.",
+                elem_id="provider-switch",
+            )
+            privacy_note = gr.Markdown(_privacy_text(settings.llm_provider))
+
+        provider.change(_privacy_text, inputs=provider, outputs=privacy_note)
+
         with gr.Column(elem_id="chat-panel"):
             gr.ChatInterface(
                 fn=app.chat,
+                additional_inputs=[provider],
                 chatbot=gr.Chatbot(
                     height=520,
                     show_label=False,
@@ -345,7 +376,9 @@ def build_demo() -> gr.Blocks:
                 speaker = gr.Audio(label="Spoken answer", autoplay=True)
 
                 mic.stop_recording(
-                    app.voice_ask, inputs=mic, outputs=[heard, voice_answer, speaker]
+                    app.voice_ask,
+                    inputs=[mic, provider],
+                    outputs=[heard, voice_answer, speaker],
                 )
         else:
             gr.Markdown(
@@ -357,6 +390,12 @@ def build_demo() -> gr.Blocks:
 
 
 def main() -> None:
+    print(
+        f"Effective config: provider={settings.llm_provider}, "
+        f"hosted={settings.hosted_base_url} ({settings.hosted_model}), "
+        f"refusal_threshold={settings.refusal_threshold}, "
+        f"hf_offline={settings.hf_offline}"
+    )
     # localhost only, no public share link: privacy by default.
     build_demo().launch(
         server_name=settings.server_name,

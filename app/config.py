@@ -4,6 +4,7 @@ All settings are read from environment variables / the .env file.
 This is the single source of truth for the local-vs-hosted LLM switch.
 """
 
+import os
 from typing import Literal
 
 from pydantic import Field
@@ -76,8 +77,19 @@ class Settings(BaseSettings):
     whisper_model: str = "mlx-community/whisper-base-mlx"
     piper_voice: str = "models/voices/en_US-lessac-medium.onnx"
 
+    # Hugging Face Hub
+    # sentence-transformers contacts the HF Hub at import/load time; on a
+    # throttled connection this measured 346s vs 5.7s offline. Enable once
+    # models are cached locally.
+    hf_offline: bool = False
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic
 # will validate the settings on startup, erroring if something is misconfigured.
 settings = Settings()
+
+# Bridge to the process environment: HF libraries read os.environ, and
+# pydantic-settings does not export .env values there automatically.
+if settings.hf_offline:
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")

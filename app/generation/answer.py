@@ -29,11 +29,13 @@ def format_context(docs: list[Document]) -> str:
     return "\n\n---\n\n".join(blocks)
 
 
-def generate_answer(question: str, docs: list[Document]) -> GroundedAnswer:
+def generate_answer(
+    question: str, docs: list[Document], provider: str | None = None
+) -> GroundedAnswer:
     """Build the grounded prompt and query the configured LLM."""
     prompt = load_prompt()
     rendered = prompt.render(context=format_context(docs), question=question)
-    answer = complete(rendered)
+    answer = complete(rendered, provider=provider)
 
     sources = [
         {
