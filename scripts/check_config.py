@@ -16,6 +16,7 @@ def main() -> None:
     # We print only WHETHER a key is set — never the key itself.
     key_status = "set" if settings.hosted_api_key else "not set (fine for local mode)"
     print(f"Hosted API key   : {key_status}")
+    print(f"HF offline       : {settings.hf_offline}")
 
 
 if __name__ == "__main__":
