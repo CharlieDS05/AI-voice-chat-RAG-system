@@ -51,7 +51,7 @@ optimizes precision over a small candidate pool.
 The flow is a LangGraph state machine (`app/graph.py`), so the refusal branch is
 an explicit edge rather than an `if` buried in application code.
 
-**Stack:** LangGraph · ChromaDB · sentence-transformers · rank-bm25 · Ollama ·
+**Stack:** LangGraph · ChromaDB · fastembed · rank-bm25 · Ollama ·
 Gradio · MLX Whisper · Piper · Ragas · Pydantic Settings · GitHub Actions
 
 ---
@@ -174,15 +174,36 @@ compare them on the same question.
 ### Note on first-run speed
 
 The first launch downloads the embedding (~80 MB) and reranker (~80 MB) models.
-ML libraries can also take several minutes to load *cold* on memory-constrained
-machines (measured: ~6s warm vs ~410s cold on an 8 GB M1). Subsequent runs are
-much faster.
-
-Once the models are cached, set `HF_OFFLINE=1` in `.env`. This skips Hugging Face
-Hub network calls at import time — measured at **346s → 5.7s** on a throttled
-connection. Leave it at `0` in Docker and CI, where no cache exists.
+The current retrieval stack uses fastembed with ONNX Runtime rather than
+sentence-transformers/PyTorch, substantially reducing the runtime dependency footprint
+and warm import time. The migration results are documented in
+Runtime optimization.
+Once the models are cached, set HF_OFFLINE=1 in .env. This skips Hugging Face
+Hub network calls at import time. Tests force offline mode as well because the test
+suite must never depend on the network.
 
 ---
+
+## Runtime optimization
+
+The original stack loaded PyTorch through sentence-transformers for both embedding and
+reranking. Replacing it with fastembed (ONNX Runtime, using the same model weights)
+cut the dependency footprint by **3×** with no change in retrieval quality:
+
+|                     | sentence-transformers | fastembed (ONNX) |
+| ------------------- | --------------------- | ---------------- |
+| Installed packages  | 199                   | 133              |
+| Installed size      | 1,963 MB              | 636 MB           |
+| Graph import (warm) | ~6s                   | 1.9s             |
+| Retrieval hit rate  | 1.0                   | 1.0              |
+| Refusal accuracy    | 1.0                   | 1.0              |
+| False refusals      | 0                     | 0                |
+
+Equivalence was verified before migrating: embeddings matched at cosine similarity
+**1.000000** and cross-encoder scores differed by **0.0000**, so existing Chroma
+indexes remained valid without re-embedding. The golden-set evaluation confirmed
+retrieval behaviour end-to-end.
+
 
 ## LLM providers
 

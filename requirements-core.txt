@@ -19,6 +19,3 @@ openai>=1.40
 
 # UI
 gradio>=6.0
-# Voice (Apple Silicon only; pulls torch back in)
-mlx-whisper
-piper-tts

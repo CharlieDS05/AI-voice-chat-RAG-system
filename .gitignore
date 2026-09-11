@@ -1,22 +1,22 @@
 # Python
 __pycache__/
 *.py[cod]
-.venv/
+.venv*/
 venv/
 
-# Secrets & local config
+# Secrets
 .env
 
 # User data & local artifacts
 data/
-chroma_db/
+chroma_*/
 *.sqlite3
+
+# Downloaded model artifacts
+models/
 
 # macOS
 .DS_Store
 
 # Evaluation outputs
 evaluation/results/
-
-# Downloaded model artifacts
-models/

@@ -59,7 +59,7 @@ class Settings(BaseSettings):
     hybrid_top_n: int = 10  # fused candidates kept, the reranker's input pool
 
     # Reranking
-    reranker_model: str = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+    reranker_model: str = "Xenova/ms-marco-MiniLM-L-6-v2"
     rerank_top_k: int = 4  # final chunks handed to the LLM
 
     # Generation

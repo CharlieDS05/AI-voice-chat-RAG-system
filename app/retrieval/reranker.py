@@ -17,33 +17,29 @@ if TYPE_CHECKING:
     from sentence_transformers import CrossEncoder
 
 # Same lazy-singleton pattern as the embedder: load once per process.
-_reranker: "CrossEncoder | None" = None
+_reranker = None
 
-
-def get_reranker() -> "CrossEncoder":
+def get_reranker():
     global _reranker
     if _reranker is None:
-        from sentence_transformers import CrossEncoder
+        from fastembed.rerank.cross_encoder import TextCrossEncoder  # deferred
 
-        _reranker = CrossEncoder(settings.reranker_model)
+        _reranker = TextCrossEncoder(model_name=settings.reranker_model)
     return _reranker
 
 
 def rerank(
     query: str, docs: list[Document], top_k: int | None = None
 ) -> list[tuple[Document, float]]:
-    """Re-score docs against the query with the cross-encoder.
+    """Re-score docs against the query with the ONNX cross-encoder.
 
-    Returns the top_k documents ordered by descending relevance score.
-    Scores are raw logits (roughly -11..+10): only their ORDER is
-    meaningful, not their absolute scale.
+    Scores are raw logits (roughly -11..+10) — the same scale the
+    refusal threshold is calibrated against.
     """
     if not docs:
         return []
     top_k = top_k or settings.rerank_top_k
 
-    pairs = [(query, doc.page_content) for doc in docs]
-    scores = get_reranker().predict(pairs)
-
+    scores = list(get_reranker().rerank(query, [d.page_content for d in docs]))
     ranked = sorted(zip(docs, scores, strict=True), key=lambda item: item[1], reverse=True)
     return [(doc, float(score)) for doc, score in ranked[:top_k]]

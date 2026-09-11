@@ -7,19 +7,17 @@ vector, so every search result remains fully citable.
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from langchain_huggingface import HuggingFaceEmbeddings
-
+from app.retrieval.embeddings import FastEmbedEmbeddings
 from app.config import settings
 
+
 # Module-level cache: load the embedding model once per process, not per call.
-_embeddings: HuggingFaceEmbeddings | None = None
+_embeddings = None
 
-
-def get_embeddings() -> HuggingFaceEmbeddings:
-    """Return the (lazily loaded, cached) local embedding model."""
+def get_embeddings() -> FastEmbedEmbeddings:
     global _embeddings
     if _embeddings is None:
-        _embeddings = HuggingFaceEmbeddings(model_name=settings.embedding_model)
+        _embeddings = FastEmbedEmbeddings()
     return _embeddings
 
 
