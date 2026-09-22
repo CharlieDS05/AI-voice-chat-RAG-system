@@ -19,3 +19,8 @@ openai>=1.40
 
 # UI
 gradio>=6.0
+
+# API
+fastapi>=0.115
+uvicorn[standard]>=0.30
+slowapi>=0.1.9

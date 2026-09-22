@@ -318,35 +318,50 @@ def build_demo() -> gr.Blocks:
     with gr.Blocks(title="Local RAG Chat") as demo:
         gr.HTML(header_html)
 
-        with gr.Group(elem_id="corpus-panel"):
-            with gr.Row():
-                file_box = gr.File(
-                    label="Upload a PDF",
-                    file_types=[".pdf"],
-                    type="filepath",
-                    elem_id="file-box",
-                )
-
-                status = gr.Textbox(
-                    label="Index status",
-                    interactive=False,
-                    elem_id="status-box",
-                    placeholder="Nothing indexed this session yet. Upload a PDF to start.",
-                )
-
-        file_box.upload(app.upload, inputs=file_box, outputs=status)
-
-        with gr.Group(elem_id="provider-panel"):
-            provider = gr.Radio(
-                choices=["local", "hosted"],
-                value=settings.llm_provider,
-                label="Answer engine",
-                info="Hosted mode requires HOSTED_API_KEY in .env.",
-                elem_id="provider-switch",
+        if settings.demo_mode:
+            examples = "\n".join(
+                f"- *{q.strip()}*" for q in settings.demo_examples.split("|") if q.strip()
             )
-            privacy_note = gr.Markdown(_privacy_text(settings.llm_provider))
+            gr.Markdown(
+                f"**Demo** — this instance answers questions about "
+                f"**{settings.demo_corpus_name}**. Every answer cites the page it came "
+                f"from, and the system declines when the document doesn't support an "
+                f"answer.\n\nTry asking:\n{examples}\n\n"
+                f"<sub>{settings.demo_corpus_attribution}</sub>"
+            )
+        else:
+            with gr.Group(elem_id="corpus-panel"):
+                with gr.Row():
+                    file_box = gr.File(
+                        label="Upload a PDF",
+                        file_types=[".pdf"],
+                        type="filepath",
+                        elem_id="file-box",
+                    )
 
-        provider.change(_privacy_text, inputs=provider, outputs=privacy_note)
+                    status = gr.Textbox(
+                        label="Index status",
+                        interactive=False,
+                        elem_id="status-box",
+                        placeholder="Nothing indexed this session yet. Upload a PDF to start.",
+                    )
+
+            file_box.upload(app.upload, inputs=file_box, outputs=status)
+
+        if settings.demo_mode:
+            provider = gr.State(settings.llm_provider)
+        else:
+            with gr.Group(elem_id="provider-panel"):
+                provider = gr.Radio(
+                    choices=["local", "hosted"],
+                    value=settings.llm_provider,
+                    label="Answer engine",
+                    info="Hosted mode requires HOSTED_API_KEY in .env.",
+                    elem_id="provider-switch",
+                )
+                privacy_note = gr.Markdown(_privacy_text(settings.llm_provider))
+
+            provider.change(_privacy_text, inputs=provider, outputs=privacy_note)
 
         with gr.Column(elem_id="chat-panel"):
             gr.ChatInterface(

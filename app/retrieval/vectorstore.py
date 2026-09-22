@@ -7,12 +7,13 @@ vector, so every search result remains fully citable.
 
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from app.retrieval.embeddings import FastEmbedEmbeddings
-from app.config import settings
 
+from app.config import settings
+from app.retrieval.embeddings import FastEmbedEmbeddings
 
 # Module-level cache: load the embedding model once per process, not per call.
 _embeddings = None
+
 
 def get_embeddings() -> FastEmbedEmbeddings:
     global _embeddings

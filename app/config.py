@@ -83,6 +83,20 @@ class Settings(BaseSettings):
     # models are cached locally.
     hf_offline: bool = False
 
+    # API
+    api_key: str = Field(default="", repr=False)  # empty = auth disabled
+    rate_limit: str = "10/minute"
+    api_port: int = 8000
+
+    # fastembed model cache — explicit so it persists and can be baked into images
+    fastembed_cache: str = "models/fastembed"
+
+    # Demo mode: public deployment with a preloaded corpus.
+    demo_mode: bool = False
+    demo_corpus_name: str = ""
+    demo_corpus_attribution: str = ""
+    demo_examples: str = ""  # pipe-separated
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic

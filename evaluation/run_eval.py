@@ -157,10 +157,11 @@ def ragas_faithfulness(records: list[dict]) -> float | None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-ragas", action="store_true", help="skip the LLM judge")
+    parser.add_argument("--golden", default="evaluation/golden.yaml", help="golden dataset path")
     args = parser.parse_args()
 
-    cases = load_golden()
-    print(f"Golden dataset: {len(cases)} cases\n\nRunning system...")
+    cases = load_golden(args.golden)
+    print(f"Golden dataset: {len(cases)} cases from {args.golden}\n\nRunning system...")
     start = time.time()
     records = run_system(cases)
 

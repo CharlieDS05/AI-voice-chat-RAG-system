@@ -1,0 +1,35 @@
+version: 1
+cases:
+  - id: demo-four-functions
+    question: "What are the four core functions of the AI RMF?"
+    answerable: true
+    expected_pages: [25, 26]
+    category: direct
+
+  - id: demo-govern
+    question: "What does the GOVERN function cover?"
+    answerable: true
+    expected_pages: [27, 28, 29, 30]
+    category: direct
+
+  - id: demo-trustworthy
+    question: "What makes an AI system trustworthy?"
+    answerable: true
+    expected_pages: [18, 19, 20, 21, 22, 23]
+    category: multi-hop-synthesis
+
+  - id: demo-measure
+    question: "How does the framework approach measuring AI risk?"
+    answerable: true
+    expected_pages: [28, 42]
+    category: hard-paraphrase
+
+  - id: demo-unanswerable-k8s
+    question: "How do I configure a Kubernetes cluster?"
+    answerable: false
+    category: unanswerable
+
+  - id: demo-unanswerable-adjacent
+    question: "What does the framework say about training a transformer model?"
+    answerable: false
+    category: unanswerable-adjacent

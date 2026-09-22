@@ -18,7 +18,10 @@ def _get_model():
     if _model is None:
         from fastembed import TextEmbedding  # deferred: pulls onnxruntime
 
-        _model = TextEmbedding(model_name=settings.embedding_model)
+        _model = TextEmbedding(
+            model_name=settings.embedding_model,
+            cache_dir=settings.fastembed_cache,
+        )
     return _model
 
 

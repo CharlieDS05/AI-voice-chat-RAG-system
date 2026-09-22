@@ -14,17 +14,21 @@ from langchain_core.documents import Document
 from app.config import settings
 
 if TYPE_CHECKING:
-    from sentence_transformers import CrossEncoder
+    pass
 
 # Same lazy-singleton pattern as the embedder: load once per process.
 _reranker = None
+
 
 def get_reranker():
     global _reranker
     if _reranker is None:
         from fastembed.rerank.cross_encoder import TextCrossEncoder  # deferred
 
-        _reranker = TextCrossEncoder(model_name=settings.reranker_model)
+        _reranker = TextCrossEncoder(
+            model_name=settings.reranker_model,
+            cache_dir=settings.fastembed_cache,
+        )
     return _reranker
 
 
