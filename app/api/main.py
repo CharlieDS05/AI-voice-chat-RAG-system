@@ -40,11 +40,11 @@ def get_rag():
 
 
 def require_api_key(x_api_key: str = Header(default="")) -> None:
-    """Constant-time key check. No key configured -> auth disabled."""
+    """Constant-time key check. Fails closed: no key configured -> 503."""
     if not settings.api_key:
-        return
+        raise HTTPException(status_code=503, detail="API key not configured on server.")
     if not secrets.compare_digest(x_api_key, settings.api_key):
-        raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key header.")
+        raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key header.") 
 
 
 class AskRequest(BaseModel):

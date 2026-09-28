@@ -1,25 +1,45 @@
-FROM python:3.12-slim
+# syntax=docker/dockerfile:1
 
-# System deps: ffmpeg for Gradio's audio handling (harmless in text mode,
-# required if a CPU voice backend is ever added).
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
-    && rm -rf /var/lib/apt/lists/*
+FROM --platform=linux/amd64 python:3.11-slim AS builder
 
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PIP_NO_CACHE_DIR=1
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+COPY requirements-core.txt .
+RUN pip install -r requirements-core.txt
+
+# runtime
+# Platform pinned deliberately: App Runner runs x86_64 images.
+FROM --platform=linux/amd64 python:3.11-slim
+
+# Non-secret config = the validated .env values. Secrets are injected at runtime.
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HF_HUB_OFFLINE=1 \
+    HF_OFFLINE=true \
+    DEMO_MODE=true \
+    CHROMA_DIR=/app/chroma_demo \
+    SERVER_NAME=0.0.0.0 \
+    API_PORT=8000 \
+    LLM_PROVIDER=hosted \
+    HOSTED_BASE_URL=https://api.groq.com/openai/v1 \
+    HOSTED_MODEL=openai/gpt-oss-120b
+
+COPY --from=builder /opt/venv /opt/venv
 WORKDIR /app
 
-# Dependency layer first: Docker caches layers, so code edits won't
-# re-trigger the slow pip install unless requirements change.
-COPY requirements-docker.txt .
-RUN pip install --no-cache-dir -r requirements-docker.txt
+COPY models/ /app/models/
+COPY chroma_demo/ /app/chroma_demo/
+COPY demo/corpus.pdf /app/demo/corpus.pdf
+COPY prompts/ /app/prompts/
 
-# Application code
-COPY app/ app/
-COPY prompts/ prompts/
-COPY scripts/ scripts/
+COPY app/ /app/app/
+COPY scripts/ /app/scripts/
 
-# The UI must bind 0.0.0.0 inside a container to be reachable;
-# privacy is enforced by compose publishing only to the host's localhost.
-ENV SERVER_NAME=0.0.0.0
-EXPOSE 7860
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
+USER appuser
 
-CMD ["python", "-m", "scripts.run_ui"]
+EXPOSE 8000
+CMD ["python", "-m", "scripts.run_api"]

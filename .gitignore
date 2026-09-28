@@ -20,3 +20,5 @@ models/
 
 # Evaluation outputs
 evaluation/results/
+.env.*
+!.env.example
