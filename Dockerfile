@@ -9,7 +9,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY requirements-core.txt .
 RUN pip install -r requirements-core.txt
 
-# runtime
+# runtime 
 # Platform pinned deliberately: App Runner runs x86_64 images.
 FROM --platform=linux/amd64 python:3.11-slim
 
@@ -28,17 +28,24 @@ ENV PATH="/opt/venv/bin:$PATH" \
     HOSTED_MODEL=openai/gpt-oss-120b
 
 COPY --from=builder /opt/venv /opt/venv
+
+# Create the runtime user first, so the COPY steps below can give it ownership.
+# /app starts empty and owned by appuser. Changing the owner of an empty
+# folder costs nothing, unlike chown -R over 180 MB of files.
+RUN useradd -m -u 1000 appuser && mkdir /app && chown appuser:appuser /app
 WORKDIR /app
 
-COPY models/ /app/models/
-COPY chroma_demo/ /app/chroma_demo/
-COPY demo/corpus.pdf /app/demo/corpus.pdf
-COPY prompts/ /app/prompts/
+# --chown sets the owner during the copy, so each file is stored once.
+# Large, rarely-changing files first:
+COPY --chown=appuser:appuser models/ /app/models/
+COPY --chown=appuser:appuser chroma_demo/ /app/chroma_demo/
+COPY --chown=appuser:appuser demo/corpus.pdf /app/demo/corpus.pdf
+COPY --chown=appuser:appuser prompts/ /app/prompts/
 
-COPY app/ /app/app/
-COPY scripts/ /app/scripts/
+# App code last: the layer that changes on every build
+COPY --chown=appuser:appuser app/ /app/app/
+COPY --chown=appuser:appuser scripts/ /app/scripts/
 
-RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
 
 EXPOSE 8000
