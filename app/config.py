@@ -93,9 +93,18 @@ class Settings(BaseSettings):
 
     # Demo mode: public deployment with a preloaded corpus.
     demo_mode: bool = False
-    demo_corpus_name: str = ""
-    demo_corpus_attribution: str = ""
-    demo_examples: str = ""  # pipe-separated
+    demo_corpus_name: str = "the NIST AI Risk Management Framework"
+    demo_corpus_attribution: str = (
+        "Source: NIST AI 100-1, Artificial Intelligence Risk Management Framework "
+        "(AI RMF 1.0), January 2023, https://doi.org/10.6028/NIST.AI.100-1. "
+        "A U.S. Government work, not subject to copyright in the United States."
+    )
+    demo_examples: str = (  # pipe-separated
+        "What are the four core functions of the AI RMF?"
+        "|What makes an AI system trustworthy?"
+        "|How does the framework approach measuring AI risk?"
+        "|What does the framework say about training a transformer model?"
+    )
 
 
 # A single shared instance the rest of the app imports.

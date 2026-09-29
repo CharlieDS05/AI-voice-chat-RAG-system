@@ -18,3 +18,4 @@ requirements.txt
 requirements-dev.txt
 requirements-ci.txt
 requirements-docker.txt 
+models/voices/

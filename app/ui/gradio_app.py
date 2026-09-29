@@ -297,7 +297,7 @@ def _privacy_text(provider: str) -> str:
     """Live privacy disclosure — must match the selected engine, not the default."""
     if provider == "local":
         return "🔒 **Local** — documents, embeddings, and answers stay on this machine."
-    return "☁️ **Hosted** — retrieved excerpts are sent to the configured API provider."
+    return "☁️ **Hosted** — your question and the retrieved excerpts are sent to the configured API provider."
 
 
 def build_demo() -> gr.Blocks:
@@ -305,10 +305,15 @@ def build_demo() -> gr.Blocks:
 
     corpus_state = "corpus loaded" if app.graph is not None else "awaiting first upload"
 
+    if settings.demo_mode:
+        tagline = f"Ask questions about {settings.demo_corpus_name}. Every answer cites its evidence."
+    else:
+        tagline = "Ask questions of your own documents. Every answer cites its evidence."
+
     header_html = f"""
     <div id="hdr">
       <p class="wordmark">Local RAG<span class="tick">_</span></p>
-      <p class="tagline">Ask questions of your own documents. Every answer cites its evidence.</p>
+      <p class="tagline">{tagline}</p>
       <div id="rail">
         <span class="badge live">INDEX &nbsp;<b>{corpus_state}</b></span>
       </div>
@@ -350,6 +355,7 @@ def build_demo() -> gr.Blocks:
 
         if settings.demo_mode:
             provider = gr.State(settings.llm_provider)
+            gr.Markdown(_privacy_text(settings.llm_provider))
         else:
             with gr.Group(elem_id="provider-panel"):
                 provider = gr.Radio(
@@ -377,7 +383,11 @@ def build_demo() -> gr.Blocks:
                     ),
                 ),
                 textbox=gr.Textbox(
-                    placeholder="Ask a question about your documents…",
+                    placeholder=(
+                        f"Ask a question about {settings.demo_corpus_name}…"
+                        if settings.demo_mode
+                        else "Ask a question about your documents…"
+                    ),
                     show_label=False,
                 ),
             )
@@ -395,7 +405,7 @@ def build_demo() -> gr.Blocks:
                     inputs=[mic, provider],
                     outputs=[heard, voice_answer, speaker],
                 )
-        else:
+        elif not settings.demo_mode:
             gr.Markdown(
                 "*🎙️ Voice mode requires a native Apple Silicon run "
                 "(MLX Whisper). Running in text-only mode.*"
