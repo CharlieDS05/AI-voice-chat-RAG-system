@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM --platform=linux/amd64 python:3.11-slim AS builder
+FROM python:3.11-slim AS builder
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=1 PIP_NO_CACHE_DIR=1
 RUN python -m venv /opt/venv
@@ -10,8 +10,8 @@ COPY requirements-core.txt .
 RUN pip install -r requirements-core.txt
 
 # runtime 
-# Platform pinned deliberately: App Runner runs x86_64 images.
-FROM --platform=linux/amd64 python:3.11-slim
+# Platform is chosen at build time: --platform linux/arm64 for EC2 t4g (Graviton).
+FROM python:3.11-slim
 
 # Non-secret config = the validated .env values. Secrets are injected at runtime.
 ENV PATH="/opt/venv/bin:$PATH" \
