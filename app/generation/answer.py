@@ -36,6 +36,8 @@ def generate_answer(
     prompt = load_prompt()
     rendered = prompt.render(context=format_context(docs), question=question)
     answer = complete(rendered, provider=provider)
+    # gpt-oss models write citations with 【 】; convert to the [ ] format the prompt asks for
+    answer = answer.replace("【", "[").replace("】", "]")
 
     sources = [
         {
