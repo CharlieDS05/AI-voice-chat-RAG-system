@@ -21,8 +21,8 @@ cases:
   - id: demo-measure
     question: "How does the framework approach measuring AI risk?"
     answerable: true
-    expected_pages: [28, 42]
-    category: hard-paraphrase
+    expected_pages: [34, 35, 36]
+    category: paraphrase
 
   - id: demo-unanswerable-k8s
     question: "How do I configure a Kubernetes cluster?"
@@ -33,3 +33,9 @@ cases:
     question: "What does the framework say about training a transformer model?"
     answerable: false
     category: unanswerable-adjacent
+
+  - id: demo-hard-paraphrase
+    question: "Who inside a company should be responsible for making sure AI problems get handled?"
+    answerable: true
+    expected_pages: [28, 42]
+    category: hard-paraphrase
