@@ -84,7 +84,7 @@ class Settings(BaseSettings):
     hf_offline: bool = False
 
     # API
-    api_key: str = Field(default="", repr=False)  # empty = auth disabled
+    api_key: str = Field(default="", repr=False)  # empty = /ask refuses every request (503)
     rate_limit: str = "10/minute"
     api_port: int = 8000
 

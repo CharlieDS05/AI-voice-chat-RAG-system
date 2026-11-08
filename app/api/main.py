@@ -20,7 +20,7 @@ limiter = Limiter(key_func=get_remote_address)
 api = FastAPI(
     title="rag-voice-chat",
     description="Grounded question answering over PDFs, with citations and refusal.",
-    version="1.1.0",
+    version="1.2.0",
 )
 api.state.limiter = limiter
 api.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
