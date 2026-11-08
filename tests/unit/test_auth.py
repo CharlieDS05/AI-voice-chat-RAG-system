@@ -1,4 +1,5 @@
 """The /ask auth check must fail closed: no configured key means no access."""
+
 import pytest
 from fastapi import HTTPException
 
