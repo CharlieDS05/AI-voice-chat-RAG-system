@@ -203,11 +203,10 @@ Expect `Ollama is running`. If not, launch the Ollama app.
 
 ```bash
 pytest tests/unit
-pytest tests/test_auth.py
 ```
 
-The unit tests (10, no network, no models) cover the core logic. The auth tests
-cover the API key check, including the case of a server started without a key.
+The 14 unit tests need no network and no models. They cover the core logic and
+the API key check, including a server started without a key.
 
 **4. Index a document and ask it something**
 

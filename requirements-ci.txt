@@ -1,17 +1,14 @@
-pydantic-settings>=2.0
-python-dotenv>=1.0
+# CI installs exactly what the app runs in production, plus test and evaluation tools.
+-r requirements-core.txt
+
+# Testing and linting (ruff pinned so CI and local formatting always agree)
 pytest>=9.0
-pyyaml>=6.0
-langchain-community>=0.3
-langchain-text-splitters>=0.3
-pypdf>=5.0
-langchain-chroma>=0.2
-fastembed>=0.4
-rank-bm25>=0.2
-langgraph>=0.2
-openai>=1.40
+ruff==0.17.4
+
+# Evaluation (Ragas faithfulness judge)
 ragas>=0.2
 langchain-openai>=0.2
 datasets>=3.0
+
+# Builds the synthetic CI handbook
 fpdf2>=2.7
-ruff

@@ -297,7 +297,10 @@ def _privacy_text(provider: str) -> str:
     """Live privacy disclosure — must match the selected engine, not the default."""
     if provider == "local":
         return "🔒 **Local** — documents, embeddings, and answers stay on this machine."
-    return "☁️ **Hosted** — your question and the retrieved excerpts are sent to the configured API provider."
+    return (
+        "☁️ **Hosted** — your question and the retrieved excerpts are sent "
+        "to the configured API provider."
+    )
 
 
 def build_demo() -> gr.Blocks:
@@ -306,7 +309,9 @@ def build_demo() -> gr.Blocks:
     corpus_state = "corpus loaded" if app.graph is not None else "awaiting first upload"
 
     if settings.demo_mode:
-        tagline = f"Ask questions about {settings.demo_corpus_name}. Every answer cites its evidence."
+        tagline = (
+            f"Ask questions about {settings.demo_corpus_name}. Every answer cites its evidence."
+        )
     else:
         tagline = "Ask questions of your own documents. Every answer cites its evidence."
 
