@@ -19,6 +19,7 @@ TAG=$(aws ecr describe-images --repository-name rag-demo \
 # 2. Settings for Docker Compose
 cat > .env <<EOF
 IMAGE=$REGISTRY/rag-demo:$TAG
+APP_VERSION=$TAG
 SITE_ADDRESS=$(echo "$IP" | tr . -).sslip.io
 EOF
 
@@ -27,6 +28,7 @@ umask 077
 {
   echo "API_KEY=$(aws ssm get-parameter --name /rag-demo/API_KEY --with-decryption --query Parameter.Value --output text)"
   echo "HOSTED_API_KEY=$(aws ssm get-parameter --name /rag-demo/HOSTED_API_KEY --with-decryption --query Parameter.Value --output text)"
+  echo "LANGSMITH_API_KEY=$(aws ssm get-parameter --name /rag-demo/LANGSMITH_API_KEY --with-decryption --query Parameter.Value --output text)"
 } > .env.secrets
 umask 022
 
@@ -38,6 +40,9 @@ services:
     env_file: .env.secrets
     environment:
       FORWARDED_ALLOW_IPS: "*"
+      LANGSMITH_TRACING: "true"
+      LANGSMITH_PROJECT: rag-demo-prod
+      APP_VERSION: ${APP_VERSION}
     mem_limit: 1g
     restart: unless-stopped
   caddy:

@@ -6,6 +6,7 @@ name, and API key. The switch is pure configuration, no branching
 logic anywhere else in the codebase.
 """
 
+from langsmith.wrappers import wrap_openai
 from openai import OpenAI
 
 from app.config import settings
@@ -16,14 +17,14 @@ def get_client(provider: str | None = None) -> tuple[OpenAI, str]:
     provider = provider or settings.llm_provider
 
     if provider == "local":
-        client = OpenAI(base_url=settings.ollama_base_url, api_key="ollama")
+        client = wrap_openai(OpenAI(base_url=settings.ollama_base_url, api_key="ollama"))
         return client, settings.ollama_model
 
     if not settings.hosted_api_key:
         raise ValueError(
             "Hosted mode selected but HOSTED_API_KEY is not set. Add it to your .env file."
         )
-    client = OpenAI(base_url=settings.hosted_base_url, api_key=settings.hosted_api_key)
+    client = wrap_openai(OpenAI(base_url=settings.hosted_base_url, api_key=settings.hosted_api_key))
     return client, settings.hosted_model
 
 

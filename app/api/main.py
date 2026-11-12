@@ -14,6 +14,7 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.config import settings
+from app.tracing import run_config
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -70,6 +71,8 @@ def health() -> dict:
         "status": "ok",
         "provider": settings.llm_provider,
         "demo_mode": settings.demo_mode,
+        "tracing": settings.tracing_enabled,
+        "version": settings.app_version,
     }
 
 
@@ -82,7 +85,10 @@ def ask(request: Request, body: AskRequest) -> AskResponse:
     answerability threshold — the LLM is not called in that case.
     """
     try:
-        state = get_rag().invoke({"question": body.question})
+        synthetic = request.headers.get("x-client") == "smoke-test"
+        state = get_rag().invoke(
+            {"question": body.question}, config=run_config("api", synthetic=synthetic)
+        )
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=f"Service not ready: {exc}") from exc
 

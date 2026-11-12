@@ -13,6 +13,7 @@ from app.graph import make_graph
 from app.ingestion.loader import ingest_pdf
 from app.retrieval.bm25 import build_bm25_index
 from app.retrieval.vectorstore import index_chunks
+from app.tracing import run_config
 
 # Graceful voice degradation: if the user doesn't have the optional dependencies installed,
 # the voice panel will be hidden and the app will still work for text-only chat.
@@ -56,7 +57,9 @@ class RagApp:
             return "Please upload a PDF first — I have no documents indexed yet."
 
         try:
-            state = self.graph.invoke({"question": message, "provider": provider})
+            state = self.graph.invoke(
+                {"question": message, "provider": provider}, config=run_config("ui")
+            )
         except ValueError as exc:  # hosted selected but no API key
             return f"⚠️ {exc}"
 
@@ -76,7 +79,9 @@ class RagApp:
             return "", "I couldn't hear anything — try recording again.", None
 
         try:
-            state = self.graph.invoke({"question": question, "provider": provider})
+            state = self.graph.invoke(
+                {"question": question, "provider": provider}, config=run_config("voice")
+            )
         except ValueError as exc:
             return question, f"⚠️ {exc}", None
 
@@ -295,12 +300,21 @@ footer { display: none !important; }
 
 def _privacy_text(provider: str) -> str:
     """Live privacy disclosure — must match the selected engine, not the default."""
-    if provider == "local":
+    if provider == "local" and not settings.tracing_enabled:
         return "🔒 **Local** — documents, embeddings, and answers stay on this machine."
-    return (
-        "☁️ **Hosted** — your question and the retrieved excerpts are sent "
-        "to the configured API provider."
-    )
+    if provider == "local":
+        text = "🔒 **Local** — the model runs on this machine."
+    else:
+        text = (
+            "☁️ **Hosted** — your question and the retrieved excerpts are sent "
+            "to the configured API provider."
+        )
+    if settings.tracing_enabled:
+        text += (
+            "\n\n📈 **Monitoring** — each question, its retrieved excerpts, and the answer "
+            "are recorded in LangSmith and kept for 14 days."
+        )
+    return text
 
 
 def build_demo() -> gr.Blocks:

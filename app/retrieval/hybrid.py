@@ -6,6 +6,7 @@ incompatible scales, but ranks are always comparable.
 """
 
 from langchain_core.documents import Document
+from langsmith import traceable
 
 from app.config import settings
 from app.retrieval.bm25 import BM25Index
@@ -34,6 +35,7 @@ def reciprocal_rank_fusion(
     return [(doc_by_id[chunk_id], score) for chunk_id, score in ordered]
 
 
+@traceable(name="hybrid search")
 def hybrid_search(
     query: str,
     bm25_index: BM25Index,

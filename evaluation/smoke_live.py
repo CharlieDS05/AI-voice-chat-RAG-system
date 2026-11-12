@@ -22,7 +22,10 @@ with open("evaluation/golden_demo.yaml") as f:
 failures = 0
 for c in cases:
     r = httpx.post(
-        f"{base}/ask", json={"question": c["question"]}, headers={"X-API-Key": key}, timeout=60
+        f"{base}/ask",
+        json={"question": c["question"]},
+        headers={"X-API-Key": key, "X-Client": "smoke-test"},
+        timeout=60,
     )
     r.raise_for_status()
     body = r.json()

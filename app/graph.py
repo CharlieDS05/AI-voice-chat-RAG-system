@@ -32,6 +32,11 @@ class RAGState(TypedDict, total=False):
     provider: str
 
 
+def should_refuse(top_score: float) -> bool:
+    """The gate's decision: refuse when the best evidence scores below the threshold."""
+    return top_score < settings.refusal_threshold
+
+
 def make_graph(bm25_index: BM25Index):
     """Build and compile the RAG graph around a ready BM25 index."""
 
@@ -46,9 +51,7 @@ def make_graph(bm25_index: BM25Index):
         }
 
     def gate(state: RAGState) -> str:
-        if state["top_score"] < settings.refusal_threshold:
-            return "refuse"
-        return "generate"
+        return "refuse" if should_refuse(state["top_score"]) else "generate"
 
     def generate_node(state: RAGState) -> RAGState:
         result = generate_answer(state["question"], state["docs"], provider=state.get("provider"))
