@@ -109,19 +109,12 @@ class Settings(BaseSettings):
     # Tracing (LangSmith). Off unless BOTH the switch and a key are set.
     langsmith_tracing: bool = False
     langsmith_api_key: str = Field(default="", repr=False)
-    # LangSmith files each trace under an agent and one of its environments.
-    langsmith_agent_id: str = "rag-tracing-agent"
-    langsmith_agent_environment: str = "local"  # the server sets "production"
+    langsmith_project: str = "rag-dev"  # the server uses its own project
     app_version: str = "dev"  # the server sets this to the image's git commit
 
     @property
     def tracing_enabled(self) -> bool:
         return self.langsmith_tracing and bool(self.langsmith_api_key)
-
-    @property
-    def tracing_target(self) -> str:
-        """Where traces go, as agent/environment."""
-        return f"{self.langsmith_agent_id}/{self.langsmith_agent_environment}"
 
 
 # A single shared instance the rest of the app imports.
@@ -139,9 +132,6 @@ if settings.hf_offline:
 if settings.tracing_enabled:
     os.environ["LANGSMITH_TRACING"] = "true"
     os.environ["LANGSMITH_API_KEY"] = settings.langsmith_api_key
-    os.environ["LANGSMITH_AGENT_ID"] = settings.langsmith_agent_id
-    os.environ["LANGSMITH_AGENT_ENVIRONMENT"] = settings.langsmith_agent_environment
-    # A project name combined with the agent variables stops tracing, so drop any.
-    os.environ.pop("LANGSMITH_PROJECT", None)
+    os.environ["LANGSMITH_PROJECT"] = settings.langsmith_project
 else:
     os.environ["LANGSMITH_TRACING"] = "false"

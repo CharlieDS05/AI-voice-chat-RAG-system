@@ -19,13 +19,7 @@ DOC = Document(
 
 @pytest.fixture(autouse=True)
 def no_tracing_env(monkeypatch):
-    names = (
-        "LANGSMITH_TRACING",
-        "LANGSMITH_API_KEY",
-        "LANGSMITH_AGENT_ID",
-        "LANGSMITH_AGENT_ENVIRONMENT",
-    )
-    for name in names:
+    for name in ("LANGSMITH_TRACING", "LANGSMITH_API_KEY"):
         monkeypatch.delenv(name, raising=False)
 
 
@@ -40,10 +34,6 @@ def test_tracing_needs_a_key():
 def test_tracing_is_on_with_switch_and_key():
     settings = Settings(_env_file=None, langsmith_tracing=True, langsmith_api_key="k")
     assert settings.tracing_enabled
-
-
-def test_traces_go_to_the_local_environment_by_default():
-    assert Settings(_env_file=None).tracing_target == "rag-tracing-agent/local"
 
 
 def test_run_config_labels():

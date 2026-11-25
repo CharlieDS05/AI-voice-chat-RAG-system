@@ -17,7 +17,7 @@ def main() -> None:
     key_status = "set" if settings.hosted_api_key else "not set (fine for local mode)"
     print(f"Hosted API key   : {key_status}")
     print(f"HF offline       : {settings.hf_offline}")
-    tracing = f"on, {settings.tracing_target}" if settings.tracing_enabled else "off"
+    tracing = f"on, project {settings.langsmith_project}" if settings.tracing_enabled else "off"
     print(f"Tracing          : {tracing}")
 
 

@@ -41,8 +41,7 @@ services:
     environment:
       FORWARDED_ALLOW_IPS: "*"
       LANGSMITH_TRACING: "true"
-      LANGSMITH_AGENT_ID: rag-tracing-agent
-      LANGSMITH_AGENT_ENVIRONMENT: production
+      LANGSMITH_PROJECT: rag-demo-prod
       APP_VERSION: ${APP_VERSION}
     mem_limit: 1g
     restart: unless-stopped
