@@ -14,13 +14,14 @@ from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
 
 from app.config import settings
+from app.tracing import run_config
 
 limiter = Limiter(key_func=get_remote_address)
 
 api = FastAPI(
     title="rag-voice-chat",
     description="Grounded question answering over PDFs, with citations and refusal.",
-    version="1.1.0",
+    version="1.2.0",
 )
 api.state.limiter = limiter
 api.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
@@ -44,7 +45,7 @@ def require_api_key(x_api_key: str = Header(default="")) -> None:
     if not settings.api_key:
         raise HTTPException(status_code=503, detail="API key not configured on server.")
     if not secrets.compare_digest(x_api_key, settings.api_key):
-        raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key header.") 
+        raise HTTPException(status_code=401, detail="Invalid or missing X-API-Key header.")
 
 
 class AskRequest(BaseModel):
@@ -70,6 +71,8 @@ def health() -> dict:
         "status": "ok",
         "provider": settings.llm_provider,
         "demo_mode": settings.demo_mode,
+        "tracing": settings.tracing_enabled,
+        "version": settings.app_version,
     }
 
 
@@ -82,7 +85,10 @@ def ask(request: Request, body: AskRequest) -> AskResponse:
     answerability threshold — the LLM is not called in that case.
     """
     try:
-        state = get_rag().invoke({"question": body.question})
+        synthetic = request.headers.get("x-client") == "smoke-test"
+        state = get_rag().invoke(
+            {"question": body.question}, config=run_config("api", synthetic=synthetic)
+        )
     except ValueError as exc:
         raise HTTPException(status_code=503, detail=f"Service not ready: {exc}") from exc
 

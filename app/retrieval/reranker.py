@@ -10,6 +10,7 @@ vectors, and affordable because the pool is small.
 from typing import TYPE_CHECKING
 
 from langchain_core.documents import Document
+from langsmith import traceable
 
 from app.config import settings
 
@@ -32,6 +33,7 @@ def get_reranker():
     return _reranker
 
 
+@traceable(name="rerank")
 def rerank(
     query: str, docs: list[Document], top_k: int | None = None
 ) -> list[tuple[Document, float]]:

@@ -84,7 +84,7 @@ class Settings(BaseSettings):
     hf_offline: bool = False
 
     # API
-    api_key: str = Field(default="", repr=False)  # empty = auth disabled
+    api_key: str = Field(default="", repr=False)  # empty = /ask refuses every request (503)
     rate_limit: str = "10/minute"
     api_port: int = 8000
 
@@ -106,6 +106,16 @@ class Settings(BaseSettings):
         "|What does the framework say about training a transformer model?"
     )
 
+    # Tracing (LangSmith). Off unless BOTH the switch and a key are set.
+    langsmith_tracing: bool = False
+    langsmith_api_key: str = Field(default="", repr=False)
+    langsmith_project: str = "rag-dev"  # the server uses its own project
+    app_version: str = "dev"  # the server sets this to the image's git commit
+
+    @property
+    def tracing_enabled(self) -> bool:
+        return self.langsmith_tracing and bool(self.langsmith_api_key)
+
 
 # A single shared instance the rest of the app imports.
 # Here the instructions for how to configure the app are centralized, and Pydantic
@@ -116,3 +126,12 @@ settings = Settings()
 # pydantic-settings does not export .env values there automatically.
 if settings.hf_offline:
     os.environ.setdefault("HF_HUB_OFFLINE", "1")
+
+# Same bridge for tracing: the LangSmith library reads os.environ only.
+# Tracing without a key is forced off, so a half-configured server never tries.
+if settings.tracing_enabled:
+    os.environ["LANGSMITH_TRACING"] = "true"
+    os.environ["LANGSMITH_API_KEY"] = settings.langsmith_api_key
+    os.environ["LANGSMITH_PROJECT"] = settings.langsmith_project
+else:
+    os.environ["LANGSMITH_TRACING"] = "false"
